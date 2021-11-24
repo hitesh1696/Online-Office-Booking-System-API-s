@@ -8,26 +8,39 @@ use \App\Http\Controllers\{
     OfficeController,
     OfficeImageController,
     UserReservationController,
-    HostReservationController
+    HostReservationController,
+    AuthController
 };
 
+// Public Routes
+Route::post('/register',[AuthController::class, 'register']); //tested
+Route::post('/login',[AuthController::class, 'login']); //tested
+Route::get('/login',[AuthController::class, 'showLogin'])->name('login'); //tested
+
 // Tags...
-Route::get('/tags', TagController::class); 
+Route::get('/tags', TagController::class); //tested
 
 // Offices...
-Route::get('/offices', [OfficeController::class, 'index']);
-Route::get('/offices/{office}', [OfficeController::class, 'show']);
-Route::post('/offices', [OfficeController::class, 'create'])->middleware(['auth:sanctum', 'verified']);
-Route::put('/offices/{office}', [OfficeController::class, 'update'])->middleware(['auth:sanctum', 'verified']);
-Route::delete('/offices/{office}', [OfficeController::class, 'delete'])->middleware(['auth:sanctum', 'verified']);
+Route::get('/offices', [OfficeController::class, 'index']); //tested
+Route::get('/offices/{office}', [OfficeController::class, 'show']); //tested
 
-// Office Photos...
-Route::post('/offices/{office}/images', [OfficeImageController::class, 'store']); //->middleware(['auth:sanctum', 'verified'])
-Route::delete('/offices/{office}/images/{image:id}', [OfficeImageController::class, 'delete'])->middleware(['auth:sanctum', 'verified']);
+Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
+    Route::get('/users',[AuthController::class, 'index']);  //tested
+    Route::post('/logout',[AuthController::class, 'logout']); //tested
+    Route::post('/users/search/{name}',[AuthController::class, 'search']);  
 
-// User Reservations...
-Route::get('/reservations', [UserReservationController::class, 'index'])->middleware(['auth:sanctum', 'verified']);
-Route::post('/reservations', [UserReservationController::class, 'create'])->middleware(['auth:sanctum', 'verified']);
+    Route::post('/offices', [OfficeController::class, 'create']); //tested
+    Route::put('/offices/{office}', [OfficeController::class, 'update']); //tested
+    Route::delete('/offices/{office}', [OfficeController::class, 'delete']); //tested
 
-// User Reservations...
-Route::get('/host/reservations', [HostReservationController::class, 'index']);
+    // Office Photos...
+    Route::post('/offices/{office}/images', [OfficeImageController::class, 'store']); //tested
+    Route::delete('/offices/{office}/images/{image:id}', [OfficeImageController::class, 'delete']);  //tested
+
+    // User Reservations...
+    Route::get('/reservations', [UserReservationController::class, 'index']); //tested
+    Route::post('/reservations', [UserReservationController::class, 'create']); //tested
+
+    // User Reservations...
+    Route::get('/host/reservations', [HostReservationController::class, 'index']);
+});
